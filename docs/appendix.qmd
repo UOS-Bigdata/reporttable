@@ -51,7 +51,7 @@ table_output
 
 한글 문서(`.hwp`)로 바로 저장하는 기능은 지원되지 않지만, 우선 MS Word(`.docx`) 파일로 저장한 후, 한글 문서로 변환하는 방식을 사용하면 된다.  
 
-```{r}
+```r
 #| warning: FALSE
 #| message: FALSE
 #| 
@@ -118,7 +118,7 @@ summary_table_gtsummary
 
 다음으로  `gtsummary`를 활용하여 Word(`docx`) 파일로 저장할 수 있다.
 
-```{r}
+```r
 #| warning: FALSE
 #| message: FALSE
 library(officer)
@@ -159,7 +159,7 @@ summary(summary_table_arsenal)
 
 다음은 `arsenal`의 분석 결과를 Word(`docx`) 파일로 저장하는 과정이다.
 
-```{r}
+```r
 #| warning: FALSE
 #| message: FALSE
 # Word 문서로 저장

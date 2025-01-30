@@ -33,10 +33,12 @@ source(here::here("_common", "_common.R"))
 3. 워드(`docx`)로 출력한 표를 아래한글(`HWP`)로 출력한다.
 
 
-이전 챕터 `dplyr`,`tidyr`패키지의 함수소개에서 쓰인 데이터프레임을 갖고 `flextable`을 보이는 함수를 소개한다.
+@sec-datatable  에서 `dplyr`,`tidyr`패키지의 함수소개에서 쓰인 데이터프레임을 갖고 `flextable`을 보이는 함수를 소개한다.
 
 ```{r}
-#| warning: FALSE
+#| label: flex-ex-data
+#| warning: false
+#| message: false
 
 library(flextable)
 
@@ -53,6 +55,11 @@ df <- data.frame(
 데이터프레임 df를 가장 기본적인 flextable 형태로 보여준다.
 
 ```{r}
+#| label: tbl-flex-basic1
+#| tbl-cap: 가장 간단한 테이블
+#| warning: false
+#| message: false
+
 ft1 <- flextable(df)
 ft1
 ```
@@ -62,6 +69,11 @@ ft1
 테이블에서 헤더부분의 행이름부분의 스타일을 설정하는 방법은 다음과 같다.
 
 ```{r}
+#| label: tbl-flex-basic2
+#| tbl-cap: 스타일과 테마의 적용
+#| warning: false
+#| message: false
+
 ft2 <- flextable(df)
 # 헤더 부분을 굵게(bold) 설정
 ft2 <- bold(ft2, part = "header")
@@ -92,6 +104,10 @@ ft2
 점수가 80 미만인 행 강조하는 코드는 다음과 같다.
 
 ```{r}
+#| label: tbl-flex-basic3
+#| tbl-cap: 조건부 작업
+#| warning: false
+#| message: false
 ft3 <- flextable(df)
 
 # 조건: 점수가 80 미만인 경우, 해당 행의 "점수" 셀 글씨 색을 빨간색으로
@@ -117,6 +133,10 @@ ft3
 일부 열에 숫자를 우측으로 정렬하고 싶거나, 표에 제목을 삽입하고 싶은 경우는 다음과 같다.
 
 ```{r}
+#| label: tbl-flex-basic4
+#| tbl-cap: 셀 포맷의 지정
+#| warning: false
+#| message: false
 ft4 <- flextable(df)
 
 # 나이, 점수 열을 우측 정렬
@@ -143,7 +163,8 @@ ft4
 
 
 
-## 통계표의 출력
+
+## 실습: 통계표 작성과 출판
 
 이전 챕터에서 쓴`초등학교 체력측정 자료`의 통계표를 활용해보자.
 
@@ -151,19 +172,20 @@ ft4
 
 
 ```{r} 
-#| label: table-pract-data
+#| label: flex-pract-data
 #| warning: FALSE
 #| message: FALSE
 
 load(here::here("data", "physical100_data.RData"))
-ls()
 ```    
 
 
 ```{r}
+#| label: flex-summ-func
 #| warning: FALSE
 #| echo: FALSE
 #| message: FALSE
+#| 
 my_summ_func <- list(
   `개수` = ~sum(!is.na(.x)),
   `결측개수` = ~sum(is.na(.x)),
@@ -210,7 +232,34 @@ summ_function_general <- function(df, cols_to_row, cols_to_col, cols_to_summ, st
 }  
 ```
 
+### 전역 설정 
+
+`flextable` 로 여러 개의 표를 작성하는 경우 모든 표에 적용되는 특성을 `set_flextable_defaults` 함수로 지정할 수 있다. 글자의 크기, 자정된 부분의 색, 셀의 간격 등 다양한 특성을 전역으로 지정할 수 있다. 
+
+다음은 특별히 표에 사용되는 글자의 크기를 `9pt` 로 지정하고 자연수의 1000단위 컴마를 적용하지 핞는 등  몇 개의 특성을 지정한 명령어이다. 
+
 ```{r}
+#| label: flex-globalopt
+#| warning: false
+#| message: false
+#| 
+set_flextable_defaults(
+  font.size = 9, 
+  padding.bottom = 3, 
+  padding.top = 3,
+  padding.left = 3,
+  padding.right = 3,
+  big.mark = "", 
+  font.color = "#666666",
+  border.color = "#666666"
+)
+```
+
+
+이제 다음과 같이 요약 통계량이 계산된 데이터 프레임을 3개 만들어 보자.
+
+```{r}
+#| label: flex-make-summ3
 #| warning: FALSE
 #| message: FALSE
 
@@ -222,99 +271,75 @@ tab3 <- summ_function_general(df1_youth, c("TEST_SEX", "TEST_AGE"), c("TEST_YEAR
 ```
 
 
-### 예제
+### 코드 해설 
 
-`tab1`의 통계표를 다음과 같이 적용한다.
-
-1. `tab1_cols <- colnames(tab1)`
-
-tab1의 모든 열 이름을 추출해 `tab1_cols`에 저장한다.
-
-이 값은 곧 `flextable(col_keys = tab1_cols)`에서 사용된다.
-
-2. `tab1 %>% dplyr::group_by(ITEM, TEST_SEX, TEST_AGE)`
-
-`tab1`를 `ITEM`, `TEST_SEX`, `TEST_AGE` 조합으로 그룹화한다.
-
-이후 `mutate()` 등에서 그룹 내 계산을 수행할 수 있다.
-
-3. `dplyr::mutate(is_last_val_in_group = row_number() == max(row_number()))`
-
-각 그룹별(`ITEM`, `TEST_SEX`, `TEST_AGE`)로 **행 번호(row_number())**를 매기고, 그 번호가 그룹 내 최대값이면 `TRUE`를, 아니면 `FALSE`를 `is_last_val_in_group` 컬럼에 저장한다.
-
-4. `flextable(col_keys = tab1_cols )`
-
-`flextable` 패키지로 `tab1`를 테이블 형태로 변환한다.
-
-`col_keys = tab1_cols`로 지정해, 모든 열(이름은 `tab1_cols`)을 테이블에 표시한다.
-
-5. `merge_v(j = 1:3)`
-
-`j = 1:3`는 테이블의 첫 번째 부터 세 번째 열에 대해 세로 병합을 적용하겠다는 의미이다.
-
-6. `autofit()`
-
-셀 너비와 높이를 자동으로 맞추도록 설정한다.
-
-7. `theme_booktabs(bold_header = TRUE)`
-
-`flextable`의 테마를 “booktabs” 스타일로 지정하고, 헤더(header)를 볼드체로 만든다.
-
-8. `align(align = "left", part = "header", j =1:3)`
-
-테이블의 헤더 부분(`part = "header"`) 중, 첫 3개 열(`j =1:3`)을 왼쪽 정렬(`"left"`)한다.
-
-9. `colformat_double(i = ~(STAT=="개수" | STAT=="결측개수"), digits = 0, big.mark = get_flextable_defaults()$big.mark)`
-
-숫자 서식 지정 함수로써, 
-
-`i = ~(STAT=="개수" | STAT=="결측개수")`: 조건식으로, STAT 열이 `"개수"` 또는 `"결측개수"`인 행을 골라낸다.
-
-해당 셀들의 표시 소수점 자릿수(`digits`)를 0으로 설정 → 정수로 표현.
-
-10. `colformat_double(i = ~!(STAT=="개수" | STAT=="결측개수"), digits = 2)`
-
-바로 위와 비슷한 숫자 서식 지정이지만, 조건이 STAT가 “개수” 또는 “결측개수”가 아닌 경우(`!()`)이다.
-
-소수점 자릿수를 2로 설정 → 소수 둘째 자리까지 표시한다.
-
-11. `hline(i = ~is_last_val_in_group == TRUE, border = fp_border())`
-
-가로줄(`hline`)을 추가한다.
-
-`i = ~is_last_val_in_group == TRUE` → 각 그룹의 마지막 행에 가로줄을 그린다.
-
-`fp_border()`는 `flextable`에서 제공하는 테두리(border) 설정 함수로, 기본 스타일의 선을 만든다.
-
-12. `fix_border_issues()`
-
-테이블 테두리 관련된 미세한 문제를 자동으로 조정(수정)해 주는 함수이다.
+이제 데이터프레임 `tab1` 을 다음과 같은 코드를 사용하여 출판가능한 테이블로 만들려고 한다.
+각 코드가  수행하는 작업을 아래와 같이 설명할 수 있다.
 
 ```{r}
-tab1_cols <- colnames(tab1)
+#| label: flex-table-1
+#| warning: false
+#| message: false
+
+
+tab1_cols <- colnames(tab1)   # <1>
 AA <-  tab1 %>% 
-    dplyr::group_by(ITEM, TEST_SEX, TEST_AGE) %>%
-    dplyr::mutate(is_last_val_in_group = row_number() == max(row_number()))  %>%
-    flextable(col_keys = tab1_cols ) %>% 
-    merge_v( j = 1:3 )  %>%
-    autofit()  %>%
-    theme_booktabs(bold_header = TRUE) %>%
-    align(align = "left", part = "header", j =1:3) %>% 
-    colformat_double(i = ~(`STAT`=="개수" | `STAT`=="결측개수" ) , digits = 0,
-                      big.mark =     get_flextable_defaults()$big.mark) %>%
-    colformat_double(i = ~!(`STAT`=="개수" | `STAT`=="결측개수" ), digits = 2) %>%
-    hline(i = ~is_last_val_in_group == TRUE, border = fp_border()) %>%
-    fix_border_issues() 
-
-AA
+    dplyr::group_by(ITEM, TEST_SEX, TEST_AGE) %>%  # <2>
+    dplyr::mutate(is_last_val_in_group = row_number() == max(row_number()))  %>%  # <3>
+    flextable(col_keys = tab1_cols ) %>%  # <4>
+    merge_v( j = 1:3 )  %>% # <5>
+    autofit()  %>%  # <6>
+    theme_booktabs(bold_header = TRUE) %>%  # <7>
+    align(align = "left", part = "header", j =1:3) %>%  # <8>
+    colformat_double(i = ~(`STAT`=="개수" | `STAT`=="결측개수" ) , digits = 0,   # <9>
+                      big.mark =     get_flextable_defaults()$big.mark) %>%  
+    colformat_double(i = ~!(`STAT`=="개수" | `STAT`=="결측개수" ), digits = 2) %>% # <10>
+    hline(i = ~is_last_val_in_group == TRUE, border = fp_border()) %>%  # <11>
+    fix_border_issues()  # <12>
 ```
+1. tab1의 모든 열 이름을 추출해 `tab1_cols`에 저장한다.  이 값은 곧 `flextable` 의 `col_keys`로  사용된다.
 
+2. `tab1`를 `ITEM`, `TEST_SEX`, `TEST_AGE` 조합으로 그룹화한다.
+
+
+3. 각 그룹별(`ITEM`, `TEST_SEX`, `TEST_AGE`)로 행 번호(row_number())를 매기고, 그 번호가 그룹 내 최대값이면 `TRUE`를, 아니면 `FALSE`를 `is_last_val_in_group` 컬럼에 저장한다.
+
+4. `flextable` 패키지로 `tab1`를 테이블 형태로 변환한다. `col_keys = tab1_cols`로 지정해, 모든 열(이름은 `tab1_cols`)을 테이블에 표시한다.
+
+5. `j = 1:3`는 테이블의 첫 번째 부터 세 번째 열에 대해 세로 병합을 적용하겠다는 의미이다.
+
+6. 셀 너비와 높이를 자동으로 맞추도록 설정한다.
+
+7. `flextable`의 테마를 “booktabs” 스타일로 지정하고, 헤더(header)를 볼드체로 만든다.
+
+8. 테이블의 헤더 부분(`part = "header"`) 중, 첫 3개 열(`j =1:3`)을 왼쪽 정렬(`"left"`)한다.
+
+9. 숫자 서식 지정 함수로써, `i = ~(STAT=="개수" | STAT=="결측개수")`: 조건식으로, STAT 열이 `"개수"` 또는 `"결측개수"`인 행을 골라낸다. 해당 셀들의 표시 소수점 자릿수(`digits`)를 0으로 설정 → 정수로 표현.
+
+10. 바로 위와 비슷한 숫자 서식 지정이지만, 조건이 STAT가 “개수” 또는 “결측개수”가 아닌 경우(`!()`)이다. 소수점 자릿수를 2로 설정 → 소수 둘째 자리까지 표시한다.
+
+11. 가로줄(`hline`)을 추가한다. `i = ~is_last_val_in_group == TRUE` → 각 그룹의 마지막 행에 가로줄을 그린다. 
+`fp_border()`는 `flextable`에서 제공하는 테두리(border) 설정 함수로, 기본 스타일의 선을 만든다.
+
+12. 테이블 테두리 관련된 미세한 문제를 자동으로 조정(수정)해 주는 함수이다.
+
+```{r}
+#| label: flex-table-11
+#| warning: false
+#| message: false
+
+AA 
+```
 
 이러한 형태로 다음 통계표도 비슷하게 결과를 낼 수 있다.
 
 하지만 매번 통계표를 구할 때 복잡한 코드를 입력하기 어려우니 이 경우에도 함수를 만들어서 간편하게 돌려보자.
 
 ```{r}
+#| label: flex-table-2
+#| warning: false
+#| message: false
+#| 
 tab2_cols <- colnames(tab2)
 BB <-  tab2 %>% 
     dplyr::group_by(ITEM, TEST_AGE) %>%
@@ -337,6 +362,10 @@ BB
 
 
 ```{r}
+#| label: flex-table-3
+#| warning: false
+#| message: false
+#| 
 tab3_cols <- colnames(tab3)
 CC <-  tab3 %>% 
     dplyr::group_by(ITEM, TEST_SEX) %>%
@@ -357,57 +386,6 @@ CC <-  tab3 %>%
 CC
 ```
 
-### 함수만들기 (함수보완수정추후 예정)
-
-`flextable`도 `dplyr`,`tidyr`와 마찬가지로 여러가지 세부조정을 할수 있기에 코드가 많이 복잡할 수 있다.
-
-또한, 통계표를 1개만 출력하는 것이 아니기에 여러가지 통계표를 출력하는 데 비효율적이므로 함수를 만들어서 간편하게 통계표를 출력해보자.
-
-`table_function_general`은 예제에 나온 코드와의 차이점은
-
-- “이 데이터프레임의 상위 몇 개 열을 ‘행 그룹’으로 지정할 것인지”를 `num_group_rows`로 조절한다.
-
-- 직접함수를 만들 때 필요한 것으로 입력한 인자를 잘 인식시키기 위해 `!!!`와 `syms`를 적용했다.
-
-```{r}
-table_function_general <- function(df, num_group_rows) {
-  
-    table_cols <- colnames(df)
-    col1 <- syms(table_cols[1:num_group_rows])
-
-ft1 <-  df %>% 
-
-    dplyr::group_by(!!!col1) %>%
-    dplyr::mutate(is_last_val_in_group = row_number() == max(row_number()))  %>%
-    flextable(col_keys = table_cols ) %>% 
-    merge_v( j = 1:num_group_rows )  %>%
-    valign(j = 1:(num_group_rows), valign = "top") %>%
-    separate_header() %>%
-    autofit()  %>%
-    theme_booktabs(bold_header = TRUE) %>%
-    align(align = "left", part = "header", j =1:num_group_rows) %>% 
-    #colformat_double(i = ~(`STAT`=="개수" | `STAT`=="결측개수" ) , digits = 0,
-    #                  big.mark =     get_flextable_defaults()$big.mark) %>%
-    #colformat_double(i = ~!(`STAT`=="개수" | `STAT`=="결측개수" ), digits = 2) %>%
-    hline(i = ~is_last_val_in_group == TRUE, border = fp_border()) %>%
-    fix_border_issues() 
-
-    return(ft1)
-}
-```
-
-직접 만든 함수를 사용하여 다음과 같이 통계표를 쉽게 구할 수 있다.
-
-```{r}
-mytable1 <- table_function_general(tab1, 3)
-mytable1 
-
-mytable2 <- table_function_general(tab2, 2)
-mytable2 
-
-mytable3 <- table_function_general(tab3, 2)
-mytable3 
-```
 
 ## 아래한글(`HWP`)로 내보내기
 
@@ -445,8 +423,19 @@ print(my_doc, target = "my_flextable.docx")
 
 ![](../images/3rd.png)
 
+## 질문과 태그
+
+- 질문 
+
+1. 통계표는 단순한 숫자의 나열이 아닙니다. 독자가 원하는 핵심 정보를 명확하게 전달해야 합니다. `flextable` 패키지를 이용해 표를 만들면서 가장 인상 깊었던 기능은 무엇이었으며, 이를 어떻게 응용할 수 있을까요?  
+
+2. 보고서의 품질은 내용뿐만 아니라 형식에서도 결정됩니다. Quarto를 이용하여 Word, PDF, Excel 등 다양한 문서 포맷으로 변환하는 과정에서 가장 주의해야 할 점은 무엇인지 생각해 보십시오.  
 
 
+
+- 태그
+
+**flextable**, **보고서자동화**, **Quarto출판**, **문서포맷변환**  
 
 
 

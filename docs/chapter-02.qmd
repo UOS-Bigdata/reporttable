@@ -242,6 +242,28 @@ df_arranged
 - 만약 높은 순서부터 정렬을 원한다면 `arrange(desc(점수))`
 
 
+###  행의 선택: `filter()`
+
+- 주어진 조건에 따라서 행들을 선택할 수 있다.
+
+- 다음 예시는 나이가 30세 이상인 관측단위만 선택 
+
+```{r}
+#| label: table-filt
+#| warning: false
+#| message: false
+
+df_filtered <- df %>%
+  filter(나이 >= 30)
+
+df_filtered
+```
+
+- `arrange(점수)`: 점수가 낮은 순서에서 높은 순서로 정렬
+
+- 만약 높은 순서부터 정렬을 원한다면 `arrange(desc(점수))`
+
+
 ### 컬럼 묶기  `across()`
 
 - 여러 열에 대해 동일한 함수를 일괄 적용할 때 사용한다.
@@ -283,8 +305,14 @@ df_across
 
 - 가로 방향으로 나열된 데이터를 세로 방향(긴 형태, Long format)로 변환한다.
 
-![긴 형식으로 변환](../images/longer.png)
-: 긴 형식으로 변환(그림출처: `tidyr` 홈페이지)
+```{r}
+#| label: fig-tablelonger
+#| fig-cap: "긴 형식으로 변환 (그림출처: `tidyr` 홈페이지)"
+#| out-width: "70%"
+knitr::include_graphics(here::here("images", "longer.png"))
+```
+                        
+
 
 - 보통 측정 항목(예: 나이, 점수)이 열로 되어 있을 때, 이를 "변수 이름"과 "값"의 두 열로 합쳐서 “길게”(long) 만들 때 쓰인다.
 
@@ -316,8 +344,13 @@ df_long
 
 - 세로 방향(긴 형태)로 나열된 데이터를 가로 방향(넓은 형태)으로 변환한다.
 
-![넓은 형식으로 변환](../images/wider.png)
-: 넓은 형식으로 변환(그림출처: `tidyr` 홈페이지)
+
+```{r}
+#| label: fig-tablewider
+#| fig-cap: "넓은 형식으로 변환 (그림출처: `tidyr` 홈페이지)"
+#| out-width: "70%"
+knitr::include_graphics(here::here("images", "wider.png"))
+```
 
 - 일반적으로 `pivot_longer()`로 만들었던 긴 데이터 프레임을 다시 열별로 펼칠 때 사용한다.
 
@@ -688,7 +721,7 @@ tab2 <- summ_function_general(df1_youth,
                               c("ITEM_F001", "ITEM_F002"),
                               stat_fun = my_summ_func_2)
 
-head(tab2,20) %>% kbl() %>%kable_styling()
+head(tab2,10) %>% kbl() %>%kable_styling()
 ```
 
 ```{r}
@@ -699,10 +732,24 @@ tab3 <- summ_function_general(df1_youth,
                               stat_fun = my_summ_func_2,
                               stat_to_column = TRUE)
 
-head(tab3,20) %>% kbl() %>%kable_styling()
+head(tab3,10) %>% kbl() %>%kable_styling()
 ```
 
 
+
+## 질문과 태그
+
+- 질문 
+
+ 1. 원시 데이터(raw data)는 언제나 복잡하고 다듬어야 할 부분이 많습니다. 여러분은 데이터를 보다 쉽게 이해할 수 있도록 요약하는 과정에서 `dplyr`과 `tidyr`의 어떤 기능을 가장 유용하게 활용하셨습니까?  
+ 
+2. 데이터를 요약하는 과정에서 `group_by()`와 `summarize()` 함수의 역할은 무엇인지, 이를 활용한 실습에서 경험한 어려움이 있다면 무엇이었는지 고민해 보시기 바랍니다.  
+
+
+
+- 태그
+
+**데이터요약**, **dplyr**,  **tidyr**, **그룹별통계**  
 
 
 
