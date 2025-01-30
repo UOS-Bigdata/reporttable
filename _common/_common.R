@@ -15,10 +15,6 @@ library(gtsummary)
 library(arsenal)
 
 
-
-library(broom)
-library(sjtable2df)
-
 # ======= ggplot2 에서 한글을 사용할 수 있게 해주는 명령어
 library(showtext)
 # Nanum Pen Script 는 선택

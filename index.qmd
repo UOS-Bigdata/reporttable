@@ -31,8 +31,11 @@
 
 :::
 
+### 교과서 홈페이지
 
-### 프로그램 
+이 교과서의 내용은 [온라인 홈페이지](https://uos-bigdata.github.io/reporttable/) 에 있다.
+
+### 응용 프로그램 
 
 - [`R`](https://www.r-project.org/): 데이터 사이언스를 위한 컴퓨터 언어
 - [`Rstudio`](https://posit.co/download/rstudio-desktop/) : R 언어를 사용하기 위한 GUI
@@ -47,13 +50,19 @@
 library(here)
 library(tidyverse)
 library(knitr)
+library(kableExtra)
+
 library(DescTools)
 library(mice)
 library(ggmice)
 library(naniar)
+
 library(flextable)
-library(broom)
-library(sjtable2df)
+library(officer)
+library(gtsummary)
+library(arsenal)
+
+library(showtext)
 ```
 
 ### 예제 자료  

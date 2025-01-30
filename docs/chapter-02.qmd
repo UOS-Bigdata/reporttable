@@ -100,9 +100,9 @@ df %>%
   )
 ```
 
-::: {callout-note}
+::: {.callout-note}
 
-### 제이터프레임의 컬럼명
+### 데이터프레임의 컬럼명
 
 `dplyr`과 `tidyr` 제공되는 함수들은 간결한 연산([tidy evaluation](https://dplyr.tidyverse.org/articles/programming.html))의 방식이 적용되어 데이터프레임의 컬럼 이름을 나타낼 때 영문과 한글 상관없이 따옴표를 붙이지 않고 없이 사용할 수 있다. 하지만  컬럼명을 한글로 사용하는 경우 간결한 연산이 적용되지 않는 다른 패키지의 함수와 같이 사용하는 경우 문제가 발생할 수 있다.
 

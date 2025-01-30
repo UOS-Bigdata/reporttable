@@ -67,7 +67,6 @@ print(doc, target = here("outputs", "statistics_table_by_flextable.docx"))
 
 이렇게 생성된 `statistics_table.docx` 파일은 MS Word에서 열어볼 수 있으며, 이후 한글 파일로 변환하여 저장할 수 있다.  
 
----
 
 ### 3. 한글(HWP) 파일로 변환  
 

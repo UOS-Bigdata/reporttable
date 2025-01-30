@@ -28,7 +28,7 @@ format:
   html:
     lang: ko 
     language: _language.yml
-    code-fold: true
+    code-fold: false
     code-overflow: wrap
     embed-resources: false
     toc: true
