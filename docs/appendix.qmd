@@ -1,0 +1,172 @@
+# 부록 {.appendix}
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(here)
+source(here::here("_common", "_common.R"))
+load(here::here("data", "physical100_data.RData"))
+```
+
+## `flextable` 을 이용한 아래 한글 테이블 작성 요약 {#sec-app-hwp} 
+
+데이터가 요약된 결과를 `flextable`을 활용하여 한글(HWP) 문서로 출력하는 방법은 다음과 같이 세 단계로 이루어진다.  
+
+### 1. R에서 원하는 통계표 생성
+
+먼저, R을 이용하여 원하는 통계 결과표를 만든다. 예를 들어, `mtcars` 데이터셋을 요약하여 표로 정리할 수 있다.  
+
+```{r}
+#| warning: FALSE
+#| message: FALSE
+#| 
+library(dplyr)
+library(flextable)
+
+# 데이터 요약
+summary_table <- mtcars %>%
+  group_by(cyl) %>%
+  summarise(
+    avg_mpg = mean(mpg),
+    avg_hp = mean(hp),
+    count = n()
+  )
+
+# `flextable`을 이용하여 보기 좋은 표로 변환
+table_output <- flextable(summary_table)
+
+# 기본 스타일 적용
+table_output <- table_output %>%
+  theme_vanilla() %>%
+  autofit()
+
+table_output
+```
+
+
+### 2. MS Word 문서로 저장  
+
+한글 문서(`.hwp`)로 바로 저장하는 기능은 지원되지 않지만, 우선 MS Word(`.docx`) 파일로 저장한 후, 한글 문서로 변환하는 방식을 사용하면 된다.  
+
+```{r}
+#| warning: FALSE
+#| message: FALSE
+#| 
+library(officer)
+
+# Word 파일로 저장
+doc <- read_docx() %>%
+  body_add_flextable(table_output) %>%
+  body_add_par("통계표 예시", style = "heading 1")
+
+print(doc, target = here("outputs", "statistics_table_by_flextable.docx"))
+```
+
+이렇게 생성된 `statistics_table.docx` 파일은 MS Word에서 열어볼 수 있으며, 이후 한글 파일로 변환하여 저장할 수 있다.  
+
+---
+
+### 3. 한글(HWP) 파일로 변환  
+
+한컴 오피스에서 `statistics_table.docx` 파일을 열고 한글(HWP) 문서 형식인 `.hwp` 로 선택하여 저장한다.  
+
+## 요약 테이블을 만드는 `R` 패키지 비교 {#sec-app-packages}
+
+
+`flextable`을 사용하여 통계표를 생성하고 Word(`.docx`)로 저장하는 작업을 `gtsummary`와 `arsenal` 패키지를 사용하여 동일하게 수행하는 방법을 소개한다.  
+
+이 두 패키지는 의학 및 연구 분야에서 통계표를 손쉽게 생성하는 데 매우 유용하며, 특히 그룹별 기술 통계 및 비교 분석 결과를 깔끔한 형식으로 제공하는 장점이 있다.  
+
+하지만 `flextable` 보다 테이블을 다양하게 출력할 수 있는 선택사항과 유연성이 부족하다. 3개의 패키지의 특징을 다음 표와 같이 요약할 수 있다.
+
+
+| 패키지 | 주요 기능 | 특징 |
+|--------|---------|------|
+| `flextable` | 데이터프레임을 표로 변환 | 다양한 스타일 지정 가능, 보고서용 고품질 테이블 제작 |
+| `gtsummary` | 그룹별 기술 통계 | 평균, 표준편차, 중앙값 등 자동 계산, 깔끔한 보고서 스타일 |
+| `arsenal` | 그룹 간 비교 및 통계 검정 | t-검정, 카이제곱 검정 포함, 연구 분석에 적합 |
+: 테이블 작성 패키지의 비교 {#tbl-app-packages}
+
+###  `gtsummary` 패키지를 사용한 통계표 생성  
+
+`gtsummary`는 그룹별 기술 통계를 자동으로 요약해 주는 패키지로, 특히 회귀 분석 결과와 그룹별 비교 통계를 자동으로 생성하는 기능이 강력하다.  
+
+다음은 `tbl_summary` 람수를 이용하요 `mtcars` 데이터에 대한  요약 테이블을 생성하는 과정이다.
+
+```{r}
+#| warning: FALSE
+#| message: FALSE
+#| 
+library(gtsummary)
+
+# 그룹별 요약 통계 생성
+summary_table_gtsummary <- mtcars %>%
+  select(cyl, mpg, hp) %>%  # 필요한 변수 선택
+  tbl_summary(by = cyl,  # 그룹 변수 (cyl: 실린더 수)
+              statistic = list(all_continuous() ~ "{mean} ({sd})"),  # 평균과 표준편차 표시
+              missing = "no") %>%  # 결측값 처리
+  modify_header(label = "변수") %>%  # 헤더 수정
+  bold_labels()  # 변수명을 굵게 표시
+
+# 출력
+summary_table_gtsummary
+```
+
+위 코드는 `mtcars` 데이터셋에서 `cyl`(실린더 수)별로 `mpg`(연비)와 `hp`(마력)의 평균과 표준편차를 요약하여 테이블을 생성한다.  
+
+다음으로  `gtsummary`를 활용하여 Word(`docx`) 파일로 저장할 수 있다.
+
+```{r}
+#| warning: FALSE
+#| message: FALSE
+library(officer)
+
+# Word 문서 생성 및 저장
+summary_table_gtsummary %>%
+  as_flex_table() %>%
+  flextable::save_as_docx(path = here::here("outputs",  "statistics_table_by_gtsummary.docx"))
+```
+
+이제 `gtsummary_statistics_table.docx` 파일이 생성되며, MS Word에서 열어볼 수 있다.  
+
+
+###  `arsenal` 패키지를 활용한 그룹 비교 분석 테이블 생성  
+
+`arsenal` 패키지는 그룹 간 기술 통계를 자동으로 생성하고, 두 그룹을 비교하는 통계 검정을 함께 제공하는 기능을 갖추고 있다.  
+
+다음은  `tableby()`를 활용하여 그룹을 비교 분석하는 프로그램이다.
+
+```{r}
+#| warning: FALSE
+#| message: FALSE
+#| results: "asis"
+library(arsenal)
+
+# 그룹 비교 분석 (실린더 수에 따른 mpg, hp 차이 검정)
+summary_table_arsenal <- tableby(
+  cyl ~ mpg + hp,  # 그룹 변수: cyl, 비교할 변수: mpg, hp
+  data = mtcars
+)
+
+# 요약 결과 출력
+summary(summary_table_arsenal)
+```
+
+위 코드는 `cyl`(실린더 수)에 따라 `mpg`(연비)와 `hp`(마력)의 기술 통계 및 그룹 간 차이에 대한 통계적 검정 결과를 제공한다. 
+
+
+다음은 `arsenal`의 분석 결과를 Word(`docx`) 파일로 저장하는 과정이다.
+
+```{r}
+#| warning: FALSE
+#| message: FALSE
+# Word 문서로 저장
+write2word(summary_table_arsenal, file =here::here("outputs", "statistics_table_by_arsenal.docx"))
+```
+
+ 
+
+

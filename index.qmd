@@ -1,0 +1,76 @@
+# 개요 {.unnumbered}
+
+
+## 목표 및 개요
+
+
+
+
+
+## 내용 요약 및 범위
+
+- 결측값에 대한 기초 분석과 기본적인 대체방법에 대하여 소개  
+- `R` 언어로 보고서용 데이터 테이블을 자동으로 작성하는 방법 소개
+- `flextable` 패키지를 이용하여 고급 품질의 테이블 작성 방법 소개
+- 테이블을 포함한 보고서를 다양한 형식(MS Word, PDF, MS Excel)으로 생성하는 방법 소개  
+
+## 활용범위 및 기대효과
+
+
+
+## 분석에 필요한 것들
+
+::: {.callout-important}
+
+### 필요한 선행 지식
+
+이 교과서를 공부하기 위해서는 다음과 같은 선행지식이 필요합니다.
+
+1. `R` 언어의 기초: 기본적인 프로그래밍의 문법, 패키지 사용, `data.frame` 에 대한 정의 및 기초,   
+2. 기초 통계학: 연속형 자료와 범주형 자료에 대한 요약 통계량(평균, 표준편차, 비율 등 ), 회귀분석의 기초 
+
+:::
+
+
+### 프로그램 
+
+- [`R`](https://www.r-project.org/): 데이터 사이언스를 위한 컴퓨터 언어
+- [`Rstudio`](https://posit.co/download/rstudio-desktop/) : R 언어를 사용하기 위한 GUI
+- [`Quarto`](https://quarto.org/) 는 오픈소스로 공개된 과학기술 분야의 출판 시스템니다 (@Allaire_Quarto_2024 참고)
+
+### R 패키지 
+
+이 책애서 사용하는 `R` 패키지는 다음과 같다.
+
+
+```r
+library(here)
+library(tidyverse)
+library(knitr)
+library(DescTools)
+library(mice)
+library(ggmice)
+library(naniar)
+library(flextable)
+library(broom)
+library(sjtable2df)
+```
+
+### 예제 자료  
+
+
+#### 국민체력100 측정자료 
+
+  - 출처: [문화빅데이터 프랫폼 - 서울올림픽기념국민체육진흥공단](https://www.bigdata-culture.kr/bigdata/user/data_market/detail.do?id=ace0aea7-5eee-48b9-b616-637365d665c1)
+
+  - 데이터 소개
+    - 서울올림픽기념 국민체육진흥공단에서 관리하고 있는 국민체력측정데이터의 항목별 측정 정보를 제공하는 데이터
+    - 체력측정 센터명, 연령대, 신장, 체중, 윗몸일으키기, BMI, 제자리 멀리뛰기 등의 체력측정 항목별 결과를 조회 가능
+
+#### 2019년 서울특별시 부동산 실거래가 자료
+
+  - 출처: [서울 열린데이터 광장](https://data.seoul.go.kr/dataList/OA-21275/S/1/datasetView.do)
+
+  - 데이터 소개
+    - 서울 열린 데이터 광장에서 2019년 서울특별시 부동산 실거래가 정보를 가진 자료
+    - 2019년 거래하여 신고한 주택들의 위치와 정보 그리고 실거래 가격이 포함된 총 67238건의 거래자료 중 일부 자료와 함성자료 
